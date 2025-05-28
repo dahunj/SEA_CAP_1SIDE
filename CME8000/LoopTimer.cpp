@@ -304,8 +304,7 @@ void CLoopTimer::Takt_Save(int nFun, int nId)
 	}
 
 	strLog.Format("MCC,(%02d) %s,(%02d) %s,%0.3lf", nFun, strFun, nId, strMsg, (GetTickCount() - m_dwTakt) / 1000.0);
-	//g_objLogFile.Save_JobListLog(strLog);
-	g_objLogFile.Save_HandlerLog(strLog);
+	g_objLogFile.Save_MCCLog(strLog);
 
 	strLog.Format("%s,%d,%s,%0.3lf", strFun, nId, strMsg,(GetTickCount() - m_dwTakt) / 1000.0);
 	g_objLogFile.Save_JobListExcel(strLog);

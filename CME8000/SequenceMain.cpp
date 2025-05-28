@@ -251,11 +251,23 @@ void CSequenceMain::Run_Replay()
 	if (m_nVisCapAlignCase == 10)  m_tVisCapAlignLoop.Set_LoopTime(30000);
 }
 
+BOOL CSequenceMain::Check_Mode()
+{
+	if(theApp.Get_MainMode() == MODE_MANUAL
+		|| theApp.Get_MainMode() == MODE_SETUP
+		|| theApp.Get_MainMode() == MODE_PARAM
+		|| theApp.Get_MainMode() == MODE_PROHIBIT
+		|| theApp.Get_MainMode() == MODE_INITIAL) return FALSE;
+	return TRUE;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Main Thread Function 
 UINT CSequenceMain::Thread_MainRun(LPVOID lpVoid)
 {
-	while (g_objSequenceMain.m_bThreadMainRun) {
+	while (g_objSequenceMain.m_bThreadMainRun)
+	{
+		if (!g_objSequenceMain.Check_Mode()) break;
 		if (!g_objCommon.Check_MainEmgAir()) break;
 		if (!g_objCommon.Check_MainDoor(TRUE)) break;
 		//if (!g_objCommon.Check_PortArea(TRUE)) break;
@@ -6169,10 +6181,6 @@ BOOL CSequenceMain::UnloadStage2_Run()
 }
 
 
-void CSequenceMain::Test_CSKIM()
-{
-
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CSequenceMain::Run_Simulation()

@@ -23,7 +23,7 @@ CCriticalSection g_csMachineStopLog;
 CCriticalSection g_csMesAgentLog;
 CCriticalSection g_csCmTrackingLog;
 CCriticalSection g_csBarcodeLog;
-
+CCriticalSection g_csMCCLog;
 CLogFile::CLogFile()
 {
 }
@@ -155,6 +155,40 @@ void CLogFile::Save_HandlerLog(CString sLog)
 	g_csHandlerLog.Unlock();
 
 	Save_ECMLog(4, sLog);
+}
+
+
+void CLogFile::Save_MCCLog(CString sLog)
+{
+	g_csMCCLog.Lock();
+
+	CString strPath = gsCurrentDir + "\\LOG\\MCC";
+
+	Create_Folder(strPath);
+
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+
+	CString strFile, strSave;
+	strFile.Format("%s\\%04d%02d%02d.txt", strPath, time.wYear, time.wMonth, time.wDay);
+
+	CFile file;
+	if (file.Open(strFile, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite)) {
+		try {
+			file.SeekToEnd();
+
+			strSave.Format("[%02d:%02d:%02d.%03d], %s\r\n", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds, sLog);
+
+			file.Write(strSave, strSave.GetLength());
+			file.Close();
+
+		} catch (CFileException *pEx) {
+			pEx->Delete();
+		}
+	}
+	g_csMCCLog.Unlock();
+
+	
 }
 
 void CLogFile::Save_SaveRunTimeLog(CString sLog)

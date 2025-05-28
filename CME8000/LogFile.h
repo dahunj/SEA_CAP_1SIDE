@@ -32,6 +32,7 @@ public:
 	void Save_MesAgentLog(CString sLog);
 	void Save_CmTrackingLog(CString strOut, int nTrayCount, int nPosX, int nPosY, int nPortNo, int nTrayNo, int nCmNo);
 	void Save_ECMTracking(CString sLog, int nTrayCount, int nPosX, int nPosY, int nPortNo, int nTrayNo, int nCmNo);
+	void Save_MCCLog(CString sLog);
 
 	void Save_PCLog(int nPNo, CString sLog);
 

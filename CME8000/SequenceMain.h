@@ -247,6 +247,8 @@ public:
 	
 	BOOL Is_MainThreadRun() { return m_bThreadMainRun; }
 	
+	BOOL Check_Mode();
+
 	void Reset_MainRunCase();
 	int *Get_pMainRunCase();
 	int  Get_MainRunCase(int nRun);
@@ -267,8 +269,6 @@ public:
 #ifdef VISION_REPEAT
 	void Set_StartIndexJig(int nJig) { m_nStartIndexJig = nJig; }
 #endif
-
-	void Test_CSKIM();	// Run Test
 
 };
 

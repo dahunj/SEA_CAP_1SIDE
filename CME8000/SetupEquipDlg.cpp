@@ -36,7 +36,7 @@ void CSetupEquipDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	for (int i = 0; i < 11; i++) DDX_Control(pDX, IDC_GROUP_0 + i, m_Group[i]);
-	for (int i = 0; i < 36; i++) DDX_Control(pDX, IDC_LABEL_0 + i,  m_Label[i]);
+	for (int i = 0; i < 37; i++) DDX_Control(pDX, IDC_LABEL_0 + i,  m_Label[i]);
 	DDX_Control(pDX, IDC_STC_EQUIP_NAME, m_stcEquipName);
 	DDX_Control(pDX, IDC_CBO_LOT_BARCODE_PORT, m_cboLotBarcodePort);
 	DDX_Control(pDX, IDC_CBO_LOAD_CELL_PORT_0, m_cboAssyLoadCellPort);
@@ -51,6 +51,7 @@ void CSetupEquipDlg::DoDataExchange(CDataExchange* pDX)
 	for (int i = 0; i < 4; i++) DDX_Control(pDX, IDC_RDO_PICK_COUNT_0 + i, m_rdoPickCnt[i]);
 	DDX_Control(pDX, IDC_LBL_DOOR_LOCK2, m_lblDoorLock2);
 	DDX_Control(pDX, IDC_STC_DOORLOCK_TIME, m_stcDoorLockTime);
+	DDX_Control(pDX, IDC_CBO_MOVE_DATA_SEL, m_cboMoveDataSelection);
 
 	DDX_Control(pDX, IDC_CHK_USE_INLINE_MODE, m_chkUseInlineMode);
 	DDX_Control(pDX, IDC_CHK_USE_VISION_CM_ALIGN, m_chkUseVisionCmAlign);
@@ -399,6 +400,15 @@ void CSetupEquipDlg::Initial_Controls()
 	m_Label[33].Init_Ctrl("πŸ≈¡", 11, TRUE, RGB(0x00, 0x00, 0x00), RGB(0xFF, 0xA0, 0x00));	// Picker Count
 	m_Label[34].Init_Ctrl("πŸ≈¡", 11, TRUE, RGB(0xFF, 0xFF, 0xFF), RGB(0x00, 0x10, 0xC0));	// Equip Data Motion check
 	m_Label[35].Init_Ctrl("πŸ≈¡", 11, FALSE, RGB(0xFF, 0xFF, 0xFF), RGB(0x40, 0x60, 0x40));	// Delay Add
+	m_Label[36].Init_Ctrl("πŸ≈¡", 11, FALSE, RGB(0xFF, 0xFF, 0xFF), RGB(0x40, 0x20, 0x20)); // Vendor Selection 
+	
+	EQUIP_DATA *pEquipData = g_objDataManager.Get_pEquipData();
+	strText.Format("%s", pEquipData->sVendor[0]); m_cboMoveDataSelection.AddString(strText); 
+	strText.Format("%s", pEquipData->sVendor[1]); m_cboMoveDataSelection.AddString(strText); 
+
+	m_cboMoveDataSelection.Init_Ctrl("πŸ≈¡", 12, TRUE, RGB(0x00, 0x00, 0x00), RGB(0xF0, 0xE0, 0x00));
+	
+	
 	m_stcEquipName.Init_Ctrl("πŸ≈¡", 15, TRUE, RGB(0x00, 0x00, 0x80), RGB(0xE0, 0xFF, 0xE0));
 	for (int i = 0; i < 4; i++) { strText.Format("COM%d", i + 1); m_cboLotBarcodePort.AddString(strText); }
 	m_cboLotBarcodePort.Init_Ctrl("πŸ≈¡", 12, TRUE, RGB(0x00, 0x00, 0x00), RGB(0xF0, 0xE0, 0x00));
@@ -484,6 +494,12 @@ void CSetupEquipDlg::Display_EquipData()
 	pEquipData->bUseDoorLock ? m_rdoDoorLock[1].SetCheck(TRUE) : m_rdoDoorLock[0].SetCheck(TRUE);
 	strData.Format("%d", gData.nDoorLockTime);	m_stcDoorLockTime.SetWindowText(strData);
 
+	m_cboMoveDataSelection.ResetContent();
+	m_cboMoveDataSelection.AddString(pEquipData->sVendor[0]);
+	m_cboMoveDataSelection.AddString(pEquipData->sVendor[1]);
+
+	m_cboMoveDataSelection.SetCurSel(pEquipData->nVendorSelection);
+
 	m_chkUseInlineMode.SetCheck(pEquipData->bUseInlineMode);
 	m_chkUseVisionCmAlign.SetCheck(pEquipData->bUseVisionCmAlign);
 	m_chkUseVisionCapAlign.SetCheck(pEquipData->bUseVisionCapAlign);
@@ -565,6 +581,9 @@ void CSetupEquipDlg::Save_EquipData()
 	gData.nDoorLockTime = atoi(strData);
 	INI.Set_Integer("EQUIPMENT", "DOOR_LOCK_TIME", gData.nDoorLockTime);
 
+	nData = m_cboMoveDataSelection.GetCurSel(); INI.Set_Integer("EQUIPMENT", "VENDOR_SELECTION", nData);
+
+
 #ifndef DRY_RUN_TEST
 	INI.Set_Bool("OPTION", "VISION_CM_ALIGN", m_chkUseVisionCmAlign.GetCheck());
 	INI.Set_Bool("OPTION", "VISION_CAP_ALIGN", m_chkUseVisionCapAlign.GetCheck());
@@ -645,6 +664,7 @@ void CSetupEquipDlg::Cancel_EquipData()
 	}
 	g_objDataManager.Read_ModelData();
 	g_objDataManager.Read_EquipData();
+	g_objDataManager.Read_MoveData();
 	g_objCommon.Read_CapShipPoatNo();
 
 	Display_EquipData();

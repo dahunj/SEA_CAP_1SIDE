@@ -9,6 +9,8 @@ typedef struct tag_EQUIP_DATA {
 	int		nLotBarcodePort;
 	int		nAssyLoadCellPort;
 	int		nUnloadLoadCellPort;
+	int		nVendorSelection;
+
 	BOOL	bJobListTaktLog;
 	int		nScreenOff;
 	int		nNoWorkTime;
@@ -63,6 +65,8 @@ typedef struct tag_EQUIP_DATA {
 	int		nCappingCnt;		// Load Cell 측정을 위해 Capping한 Cap 수량 저장
 	int		nLoadCellChkCnt;	// Assy Picker Load Cell 측정 주기
 	double	dAssyPickForce[2];	// 0: Assy Picker Force Min, 1: Assy Picker Force Max 
+
+	CString sVendor[2];
 } EQUIP_DATA;
 
 ///////////////////////////////////////////////////////////////////////////////

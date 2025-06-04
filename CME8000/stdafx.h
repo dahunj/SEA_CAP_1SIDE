@@ -69,7 +69,7 @@
 	#pragma comment(lib, "CSGridR.lib")
 #endif
 
-#define MAIN_VERSION	_T("V 1.2.10s")
+#define MAIN_VERSION	_T("V 1.2.12s")
 #define SIM_WAITTIMES	 10		//
 #define SIM_WAITTIMEM	 10		//
 #define ECM_LOG			"D:\\EVMS\\TP\\log\\"
@@ -287,6 +287,8 @@ typedef struct {
 	CString	sComName;
 	int		nDoorLockTime;
 	DWORD	dwDoorStartTime;
+
+	CString	sVendor;
 } GLOVAL_DATA;
 
 typedef struct {

@@ -5446,7 +5446,7 @@ BOOL CSequenceMain::UnloadPicker_Run()
 				int nPNo = gData.nPNoUnloadPick - 1;
 				int nTNo = gData.nTNoUnloadPick[nUpStart+i] - 1;
 				int nCNo = gData.nCNoUnloadPick[nUpStart+i] - 1;
-				if (nCNo > 0) {
+				if (nCNo >= 0) {
 					gData.nCmJigNo[nPNo][nTNo][nCNo][UNLOAD_PICK] = nUpStart + i + 1;	// Unload Pick
 					g_objLogFile.Save_CmTrackingLog("GOOD", nUpWorkTray, nUpPosX + i + 1, nUpPosY + 1, gData.nPNoUnloadPick, gData.nTNoUnloadPick[nUpStart+i], gData.nCNoUnloadPick[nUpStart+i]);
 				}

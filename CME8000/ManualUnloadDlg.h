@@ -34,7 +34,7 @@ public:
 	CButtonCS	m_btnUnloadStage2Y[5];
 	CButtonCS	m_btnUnloadStage2Z[6];
 	CButtonCS	m_btnUnloadStage2Io[4];
-	CLedCS		m_ledUnloadStage2Io[5];
+	CLedCS		m_ledUnloadStage2Io[7];
 	CButtonCS	m_btnUnloadPort1Io[4];
 	CLedCS		m_ledUnloadPort1Io[10];
 	CButtonCS	m_btnUnloadPort2Io[4];

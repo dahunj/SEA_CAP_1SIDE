@@ -47,7 +47,7 @@ void CManualUnloadDlg::DoDataExchange(CDataExchange* pDX)
 	for (int i = 0; i <  5; i++) DDX_Control(pDX, IDC_BTN_UNLOAD_STAGE2_Y_0		+ i, m_btnUnloadStage2Y[i]);
 	for (int i = 0; i <  6; i++) DDX_Control(pDX, IDC_BTN_UNLOAD_STAGE2_Z_0		+ i, m_btnUnloadStage2Z[i]);
 	for (int i = 0; i <  4; i++) DDX_Control(pDX, IDC_BTN_UNLOAD_STAGE2_IO_0	+ i, m_btnUnloadStage2Io[i]);
-	for (int i = 0; i <  5; i++) DDX_Control(pDX, IDC_LED_UNLOAD_STAGE2_IO_0	+ i, m_ledUnloadStage2Io[i]);
+	for (int i = 0; i <  7; i++) DDX_Control(pDX, IDC_LED_UNLOAD_STAGE2_IO_0	+ i, m_ledUnloadStage2Io[i]);
 	for (int i = 0; i <  4; i++) DDX_Control(pDX, IDC_BTN_UNLOAD_PORT1_IO_0		+ i, m_btnUnloadPort1Io[i]);
 	for (int i = 0; i < 10; i++) DDX_Control(pDX, IDC_LED_UNLOAD_PORT1_IO_0		+ i, m_ledUnloadPort1Io[i]);
 	for (int i = 0; i <  4; i++) DDX_Control(pDX, IDC_BTN_UNLOAD_PORT2_IO_0		+ i, m_btnUnloadPort2Io[i]);
@@ -165,7 +165,7 @@ void CManualUnloadDlg::Initial_Controls()
 	for (int i = 0; i <  5; i++) m_btnUnloadStage2Y[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, 0, 0);
 	for (int i = 0; i <  6; i++) m_btnUnloadStage2Z[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, 0, 0);
 	for (int i = 0; i <  4; i++) m_btnUnloadStage2Io[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, 0, 0);
-	for (int i = 0; i <  5; i++) m_ledUnloadStage2Io[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, CLedCS::emGreen, CLedCS::em16);
+	for (int i = 0; i <  7; i++) m_ledUnloadStage2Io[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, CLedCS::emGreen, CLedCS::em16);
 	for (int i = 0; i <  4; i++) m_btnUnloadPort1Io[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, 0, 0);
 	for (int i = 0; i < 10; i++) m_ledUnloadPort1Io[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, CLedCS::emGreen, CLedCS::em16);
 	for (int i = 0; i <  4; i++) m_btnUnloadPort2Io[i].Init_Ctrl("Arial", 10, FALSE, COLOR_DEFAULT, COLOR_DEFAULT, 0, 0);
@@ -234,6 +234,8 @@ void CManualUnloadDlg::Display_Status()
 	m_ledUnloadStage2Io[2].Set_On(pDX05->iUnloadStage2SlaveIn);
 	m_ledUnloadStage2Io[3].Set_On(pDX05->iUnloadStage2SlaveOut);
 	m_ledUnloadStage2Io[4].Set_On(pDX05->iUnloadStage2Exist);
+	m_ledUnloadStage2Io[5].Set_On(pDX05->iUnloadStage2Exist2);
+	m_ledUnloadStage2Io[6].Set_On(pDX05->iUnloadStage2Exist3);
 
 	m_ledUnloadPort1Io[0].Set_On(pDX03->iUnlaodPort1LowCheck);
 	m_ledUnloadPort1Io[1].Set_On(pDX03->iUnloadPort1SlideOpen);

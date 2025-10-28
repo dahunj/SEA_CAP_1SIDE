@@ -28,6 +28,7 @@ void CDataManager::Reset_EquipData()
 	m_EquipData.nLotBarcodePort = 0;
 	m_EquipData.nAssyLoadCellPort = 0;
 	m_EquipData.nUnloadLoadCellPort = 0;
+	m_EquipData.nVendorSelection = 0;
 	m_EquipData.bJobListTaktLog = FALSE;
 	m_EquipData.nScreenOff = 0;
 	m_EquipData.nNoWorkTime = 0;
@@ -86,6 +87,10 @@ void CDataManager::Reset_EquipData()
 	m_EquipData.nLoadCellChkCnt = 0;
 	m_EquipData.dAssyPickForce[0] = 0.0;
 	m_EquipData.dAssyPickForce[1] = 0.0;
+
+	//m_EquipData.sVendor[0] = "DH";
+	//m_EquipData.sVendor[1] = "HS";
+
 }
 
 void CDataManager::Reset_MoveData()
@@ -141,6 +146,11 @@ BOOL CDataManager::Read_EquipData()
 	m_EquipData.nScreenOff = INI.Get_Integer("EQUIPMENT", "SCREEN_OFF", 0);
 	m_EquipData.nNoWorkTime = INI.Get_Integer("EQUIPMENT", "NOWORK_TIME", 0);
 	m_EquipData.bManualTaktTest = INI.Get_Bool("EQUIPMENT", "MANUAL_TAKT_TEST", FALSE);
+
+	m_EquipData.nVendorSelection = INI.Get_Integer("EQUIPMENT", "VENDOR_SELECTION", 0);
+	m_EquipData.sVendor[0]=INI.Get_String("VENDOR","0", "");
+	m_EquipData.sVendor[1]=INI.Get_String("VENDOR","1", "");
+	gData.sVendor = m_EquipData.sVendor[m_EquipData.nVendorSelection];
 
 	m_EquipData.bUseDoorLock = INI.Get_Bool("EQUIPMENT", "DOOR_LOCK", FALSE);
 	gData.nDoorLockTime = INI.Get_Integer("EQUIPMENT", "DOOR_LOCK_TIME", 0);
@@ -231,8 +241,8 @@ BOOL CDataManager::Read_EquipData()
 
 BOOL CDataManager::Read_MoveData()
 {
-	CIniFileCS INI(gsCurrentDir + "\\System\\MoveData.ini");
-	if (!INI.Check_File()) { AfxMessageBox("MoveData.ini File Not Found!!!"); return FALSE; }
+	CIniFileCS INI(gsCurrentDir + "\\System\\MoveData_" + gData.sVendor + ".ini");
+	if (!INI.Check_File()) { AfxMessageBox("MoveData_Vendor.ini File Not Found!!!"); return FALSE; }
 
 	CString strKey;
 

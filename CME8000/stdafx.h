@@ -287,6 +287,8 @@ typedef struct {
 	CString	sComName;
 	int		nDoorLockTime;
 	DWORD	dwDoorStartTime;
+
+	CString	sVendor;
 } GLOVAL_DATA;
 
 typedef struct {

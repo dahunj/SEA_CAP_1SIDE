@@ -167,14 +167,20 @@ BOOL CDataManager::Read_EquipData()
 	m_EquipData.bUseVisionCmAlign = INI.Get_Bool("OPTION", "VISION_CM_ALIGN", FALSE);
 	m_EquipData.bUseVisionCapAlign = INI.Get_Bool("OPTION", "VISION_CAP_ALIGN", FALSE);
 #endif
+	m_EquipData.bUseVisionAlignAlarm = INI.Get_Bool("OPTION", "VISION_ALIGN_ALARM", FALSE);
+	m_EquipData.bUseAlignOffset = INI.Get_Bool("OPTION", "VISION_ALIGN_OFFSET", FALSE);
+
+	m_EquipData.nInspectCmScanTimes = INI.Get_Integer("OPTION", "SCAN_TIMES", 10000);	
+	m_EquipData.nInspectCmLotTimes = INI.Get_Integer("OPTION", "LOT_TIMES", 10000);
+	m_EquipData.nInspectCmMinutes = INI.Get_Integer("OPTION", "MINUTES", 10000);
+	
 	m_EquipData.bUseInlineMode = INI.Get_Bool("OPTION", "INLINE_MODE", FALSE);
 	m_EquipData.bUseTrayPickerTurn = INI.Get_Bool("OPTION", "TRAY_PICKER_TURN", FALSE);
 	m_EquipData.bUseCapPickerTurn = INI.Get_Bool("OPTION", "CAP_PICKER_TURN", FALSE);
 	m_EquipData.bUseAssyPickerVac = INI.Get_Bool("OPTION", "ASSY_VAC", FALSE);
 	m_EquipData.bUseIndexAssyVac = INI.Get_Bool("OPTION", "INDEX_ASSY_VAC", FALSE);
 	m_EquipData.bUseAssyPickerTiltChk = INI.Get_Bool("OPTION", "ASSY_PICKER_TILT", FALSE);
-	m_EquipData.bUseVisionAlignAlarm = INI.Get_Bool("OPTION", "VISION_ALIGN_ALARM", FALSE);
-	m_EquipData.bUseAlignOffset = INI.Get_Bool("OPTION", "VISION_ALIGN_OFFSET", FALSE);
+		
 	m_EquipData.bSortDirRight = INI.Get_Bool("OPTION", "LOAD_SORT_DIR_RIGHT", TRUE);
 	m_EquipData.bCapPickUpMulti = INI.Get_Bool("OPTION", "CAP_PICKUP_MULTI", TRUE);
 	m_EquipData.bShipTrayOneEmpty = INI.Get_Bool("OPTION", "SHIP_TRAY_ONE_EMPTY", FALSE);

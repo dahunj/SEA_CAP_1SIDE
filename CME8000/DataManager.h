@@ -67,6 +67,9 @@ typedef struct tag_EQUIP_DATA {
 	double	dAssyPickForce[2];	// 0: Assy Picker Force Min, 1: Assy Picker Force Max 
 
 	CString sVendor[2];
+	int		nInspectCmScanTimes;	// 랏 당 CM 검사 최대 횟수
+	int		nInspectCmLotTimes; 	// 시간당 랏 개수 
+	int		nInspectCmMinutes;		// 몇분 간격으로 설정 할지 	
 } EQUIP_DATA;
 
 ///////////////////////////////////////////////////////////////////////////////

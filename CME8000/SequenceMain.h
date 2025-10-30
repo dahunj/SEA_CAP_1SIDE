@@ -266,6 +266,8 @@ public:
 
 	void Init_NgTray(int nNo);
 
+	BOOL CheckInspectCmGoOrNot(int nPortNo);
+
 #ifdef VISION_REPEAT
 	void Set_StartIndexJig(int nJig) { m_nStartIndexJig = nJig; }
 #endif

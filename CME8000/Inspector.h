@@ -43,6 +43,8 @@ private:
 	void Get_TimeUpdate(CString sTime);
 	void Get_HeartBeat();
 
+	void Get_ReloadRequest();
+
 	void Send_Command(CString strSend);
 	void Exception_Log(CString sFunc, CString sGbn, int nCase);	// Recevie Exception Log
 	
@@ -63,6 +65,8 @@ public:
 	void Set_InitialRequest();
 	void Set_TimeUpdate();
 	void Set_LightOff();
+
+	void Set_ReloadComplete();
 
 	int  Get_VisionStatus();
 	BOOL Check_LotReady();

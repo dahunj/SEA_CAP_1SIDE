@@ -478,10 +478,38 @@ void CManualCapDlg::OnBtnCapPickerYClick(UINT nID)
 	if (!g_objCommon.Check_Position(AX_CAP_PICKER_Z, 0)) {
 		AfxMessageBox("Cap Picker Ready Up 위치가 아닙니다. 확인 후 진행하세요."); return;
 	}
-	if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ||
-		!pDX07->iCapPickerUp04 || !pDX07->iCapPickerUp05 || !pDX07->iCapPickerUp06) {
 
-		AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+
+	if(gData.nPickerUseCnt == 3)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03)
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 4)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ||
+			!pDX07->iCapPickerUp04 )
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 5)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ||
+			!pDX07->iCapPickerUp04 || !pDX07->iCapPickerUp05 )
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 6)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ||
+			!pDX07->iCapPickerUp04 || !pDX07->iCapPickerUp05 || !pDX07->iCapPickerUp06)
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
 	}
 
 	if (nIndex == 13 || nIndex == 14) {
@@ -637,7 +665,22 @@ void CManualCapDlg::OnBtnCapPickerIoClick(UINT nID)
 
 void CManualCapDlg::OnBtnCapBufferYClick(UINT nID)
 {
-	if (!g_objAJinAXL.Is_Home(AX_CAP_BUFFER_STAGE_Y)) return;
+	if (!g_objAJinAXL.Is_Home(AX_CAP_BUFFER_STAGE_Y))
+	{
+		AfxMessageBox("Cap Buffer Y Home 상태가 아닙니다. 확인 후 진행하세요.");
+		return;
+	}
+	if (!g_objAJinAXL.Is_Home(AX_ASSY_PICKER_Z))
+	{
+		AfxMessageBox("Assy Picker Z Home 상태가 아닙니다. 확인 후 진행하세요.");
+		return;
+	}
+	if (!g_objAJinAXL.Is_Home(AX_CAP_PICKER_Z)) 
+	{
+		AfxMessageBox("Cap Picker Z Home 상태가 아닙니다. 확인 후 진행하세요.");
+		return;
+	}
+	
 	if (!g_objCommon.Check_MainDoor()) return;
 	int nIndex = nID - IDC_BTN_CAP_BUFFER_Y_0;
 	DX_DATA_09 *pDX09 = g_objAJinAXL.Get_pDX09();
@@ -654,14 +697,53 @@ void CManualCapDlg::OnBtnCapBufferYClick(UINT nID)
 	if (!g_objCommon.Check_Position(AX_ASSY_PICKER_X, 1) && !g_objCommon.Check_Position(AX_ASSY_PICKER_X, 2) && !g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0)) {
 		AfxMessageBox("Assembly Picker Ready Up 위치가 아닙니다. 확인 후 진행하세요."); return;
 	}
+
 	if(!g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0))
 	{
-		AfxMessageBox("Assembly Picker Ready Up 위치가 아닙니다. 확인 후 진행하세요."); return;
+		AfxMessageBox("Assembly Picker Z Ready Up 위치가 아닙니다. 확인 후 진행하세요."); return;
 	}
+
 	if(!g_objCommon.Check_Position(AX_CAP_PICKER_Z, 0))
 	{
 		AfxMessageBox("Cap Picker Z Ready Up 위치가 아닙니다. 확인 후 진행하세요."); return;
 	}
+
+	DX_DATA_07 *pDX07 = g_objAJinAXL.Get_pDX07();
+
+	if(gData.nPickerUseCnt == 3)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ) 
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 4)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ||
+			!pDX07->iCapPickerUp04 ) 
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 5)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ||
+			!pDX07->iCapPickerUp04 || !pDX07->iCapPickerUp05 ) 
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 6)
+	{
+		if (!pDX07->iCapPickerUp01 || !pDX07->iCapPickerUp02 || !pDX07->iCapPickerUp03 ||
+			!pDX07->iCapPickerUp04 || !pDX07->iCapPickerUp05 || !pDX07->iCapPickerUp06) 
+		{
+			AfxMessageBox("Cap Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+
+	
+
 
 	if (nIndex == 4 || nIndex == 5) {
 		EQUIP_DATA *pEquipData = g_objDataManager.Get_pEquipData();
@@ -670,7 +752,6 @@ void CManualCapDlg::OnBtnCapBufferYClick(UINT nID)
 		g_objAJinAXL.Move_Relative(AX_CAP_BUFFER_STAGE_Y, dMove);
 
 	} else {
-		
 		g_objCommon.Move_Position(AX_CAP_BUFFER_STAGE_Y, nIndex);
 	}
 

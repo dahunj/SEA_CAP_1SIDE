@@ -250,7 +250,9 @@ LRESULT CSetupMotionTabDlg::OnCsLButtonDown(WPARAM wParam, LPARAM lParam)
 	UINT nID = (int)wParam;
 	int nStartAx = m_nMotionTab * 8;
 
-	if (nID >= IDC_BTN_JOG_P_0 && nID <= IDC_BTN_JOG_P_7) {			// Jog +
+		
+	if (nID >= IDC_BTN_JOG_P_0 && nID <= IDC_BTN_JOG_P_7) 
+	{			// Jog +
 		int ID = nID - IDC_BTN_JOG_P_0;
 		g_objAJinAXL.Jog_Positive(nStartAx + ID);
 		m_strLog.Format("[Setup Motion] Jog Positive - %s", g_objAJinAXL.Get_AxisName(nStartAx + ID));

@@ -40,10 +40,17 @@ END_MESSAGE_MAP()
 
 BOOL CAviUDP::Initialize()
 {
-	EQUIP_DATA *pEquipData = g_objDataManager.Get_pEquipData();
 	if(m_bOpened) return TRUE;
 
+	EQUIP_DATA *pEquipData = g_objDataManager.Get_pEquipData();
+
+#ifdef AJIN_BOARD_USE
 	m_bOpened = m_UdpAvi.Open_Socket(UDP_AVI_LPORT, UDP_AVI_HPORT, pEquipData->sAviIp, this);
+#else
+	m_bOpened = m_UdpAvi.Open_Socket(21000, 21001, "127.0.0.1", this);
+#endif
+
+	
 	if (!m_bOpened) return FALSE;
 
 	CString strLog;

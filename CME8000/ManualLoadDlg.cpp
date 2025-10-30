@@ -559,10 +559,37 @@ void CManualLoadDlg::OnbtnLoadPickerYClick(UINT nID)
 	if (!g_objCommon.Check_Position(AX_LOAD_PICKER_Z, 0)) {
 		AfxMessageBox("Z축이 Ready Up 위치가 아닙니다. Z축 확인 후 진행하세요."); return;
 	}
-	if (!pDX06->iLoadPickerUp01 || !pDX06->iLoadPickerUp02 || !pDX06->iLoadPickerUp03 ||
-		!pDX06->iLoadPickerUp04 || !pDX06->iLoadPickerUp05 || !pDX06->iLoadPickerUp06) {
 
-		AfxMessageBox("Load Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+	if(gData.nPickerUseCnt == 3)
+	{
+		if (!pDX06->iLoadPickerUp01 || !pDX06->iLoadPickerUp02 || !pDX06->iLoadPickerUp03 ) 
+		{
+			AfxMessageBox("Load Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 4)
+	{
+		if (!pDX06->iLoadPickerUp01 || !pDX06->iLoadPickerUp02 || !pDX06->iLoadPickerUp03 ||
+			!pDX06->iLoadPickerUp04 ) 
+		{
+			AfxMessageBox("Load Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 5)
+	{
+		if (!pDX06->iLoadPickerUp01 || !pDX06->iLoadPickerUp02 || !pDX06->iLoadPickerUp03 ||
+			!pDX06->iLoadPickerUp04 || !pDX06->iLoadPickerUp05 ) 
+		{
+			AfxMessageBox("Load Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
+	}
+	if(gData.nPickerUseCnt == 6)
+	{
+		if (!pDX06->iLoadPickerUp01 || !pDX06->iLoadPickerUp02 || !pDX06->iLoadPickerUp03 ||
+			!pDX06->iLoadPickerUp04 || !pDX06->iLoadPickerUp05 || !pDX06->iLoadPickerUp06) 
+		{
+			AfxMessageBox("Load Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
+		}
 	}
 	if (!g_objCommon.Check_Position(AX_VISION_CM_ALIGN_X, 0)) {
 		AfxMessageBox("Vision CM Align X축이 Ready 위치가 아닙니다. 확인 후 진행하세요."); return;

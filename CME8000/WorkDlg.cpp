@@ -390,7 +390,8 @@ void CWorkDlg::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-	} else if (m_rdoWorkStop.GetCheck()) 
+	} 
+	else if (m_rdoWorkStop.GetCheck()) 
 	{
 		if (m_bAutoRunning) {	// First AutoStop
 			m_bAutoRunning = FALSE;
@@ -1211,8 +1212,6 @@ void CWorkDlg::Display_Status()
 	for (int i = 0; i < 6; i++) { strText.Format("%d-%d", gData.nTNoIndex[2][i], gData.nCNoIndex[2][i]); m_stcTransNo[i].Set_Text(strText); }
 	for (int i = 0; i < 6; i++) { strText.Format("%d-%d", gData.nTNoTransStage[i], gData.nCNoTransStage[i]); m_stcTStageNo[i].Set_Text(strText); }
 	for (int i = 0; i < 6; i++) { strText.Format("%d-%d", gData.nTNoUnloadPick[i], gData.nCNoUnloadPick[i]); m_stcUnloadNo[i].Set_Text(strText); }
-
-	
 
 	m_ledVisionStatus[0].Set_On(g_objInspector.Get_VisionStatus());
 	m_ledVisionStatus[1].Set_On(pEquipData->bUseInlineMode && g_objAviUDP.Is_Connected());

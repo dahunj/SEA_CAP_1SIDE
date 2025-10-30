@@ -45,7 +45,16 @@ END_MESSAGE_MAP()
 
 void CInspector::Initialize()
 {
-	BOOL bOpened = m_UdpVisionPC.Open_Socket(UDP_VPC_LPORT, UDP_VPC_HPORT, UDP_VPC_HOST_IP, this);
+	BOOL bOpened = FALSE;
+
+#ifdef AJIN_BOARD_USE
+	bOpened = m_UdpVisionPC.Open_Socket(UDP_VPC_LPORT, UDP_VPC_HPORT, UDP_VPC_HOST_IP, this);
+#else
+	bOpened = m_UdpVisionPC.Open_Socket(7000, 7001, "127.0.0.1", this);
+#endif
+	
+	
+
 	if (bOpened) Set_ConnectRequest();
 }
 
@@ -626,6 +635,33 @@ void CInspector::Send_Command(CString strSend)
 
 	g_csInspector.Unlock();	// Critical Section
 }
+
+void CInspector::Get_ReloadRequest()
+{
+	EQUIP_DATA *pEquipData = g_objDataManager.Get_pEquipData();
+
+	if (pEquipData->bUseVisionCmAlign && !gData.bScanDone[0])
+	{	// Align
+
+		Set_ReloadComplete();
+
+		int nCase = g_objSequenceMain.Get_MainRunCase(AUTO_VISION_CM);
+		if (nCase >= 2 && nCase <= 10)
+		{
+			g_objSequenceMain.Set_MainRunCase(AUTO_VISION_CM, 3);
+			gData.bReload[0] = TRUE;
+		}
+	}
+
+}
+
+void CInspector::Set_ReloadComplete()
+{
+	CString	strSendCmd;
+	strSendCmd.Format("RELOAD,COMPLETE");
+	Send_Command(strSendCmd);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 

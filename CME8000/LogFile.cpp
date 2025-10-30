@@ -545,17 +545,17 @@ void CLogFile::Save_ECMLog(int nType, CString strLog)	//nType:1[Alarm], 2[Joblis
 
 	SYSTEMTIME time;
 	GetLocalTime(&time);
-	strTime.Format("%04d-%02d-%02d %02d:%02d:%02d:%03d", time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+	strTime.Format("%04d-%02d-%02d %02d:%02d:%02d.%03d", time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 
 	int nNo = gData.nULPNo-1;
 	if (nNo < 0) nNo = gData.nLPNo-1;
 	if (nNo < 0) nNo = 0;
 
-	if (nType == 1) sTitle.Format("Time,Station,Type,lotNum,Error Code,Error,Start_Time,End_Time,Lead_Time\r\n");
-	if (nType == 2) sTitle.Format("Time,Station,Type,lotNum,Start_Time,End_Time,Tack_Time,Tray_Count,CM_Count,Tack,Capping Fail count\r\n");
-	if (nType == 3) sTitle.Format("Time,Station,Type,lotNum,Load_Pick,Inspect,Barcode,NG_Pick,Good_Pick,Trans_Pick\r\n");
+	if (nType == 1) sTitle.Format("Time,Station,Type,LotNum,Error Code,Error,Start_Time,End_Time,Lead_Time\r\n");
+	if (nType == 2) sTitle.Format("Time,Station,Type,LotNum,Start_Time,End_Time,Tack_Time,Tray_Count,CM_Count,Tack,Capping Fail count\r\n");
+	if (nType == 3) sTitle.Format("Time,Station,Type,LotNum,Load_Pick,Inspect,Barcode,NG_Pick,Good_Pick,Trans_Pick\r\n");
 	if (nType == 4) sTitle.Format("Time,Station,Type\r\n");
-	if (nType == 5) sTitle.Format("Time,Station,SWversion,site,moduleConfig,LotNum,barcode,Ship Lot Num,Cap Lot Num,Start,End,Cap Part No,Cap Qty,Cap Maker,Cap Program Info,Cap Tool Info,Year,Month,Day,Cap Serial No,Index No,Head No,Cap Picker Table X Pos,Turn Table Work Pos,Cap Picker Table Z Pos,Cap Attach Force,Alarm Code,Tact Time,UPH\r\n");
+	if (nType == 5) sTitle.Format("Time,Station,SWversion,site,moduleConfig,LotNum,Barcode,Ship Lot Num,Cap Lot Num,Start,End,Cap Part No,Cap Qty,Cap Maker,Cap Program Info,Cap Tool Info,Year,Month,Day,Cap Serial No,Index No,Head No,Cap Picker Table X Pos,Turn Table Work Pos,Cap Picker Table Z Pos,Cap Attach Force,Alarm Code,Tact Time,UPH\r\n");
 
 	if (nType == 1) strFile.Format("%s%s_%04d%02d%02d%02d_CapAlarm.csv", strPath, gAlm.sLotID, time.wYear, time.wMonth, time.wDay, time.wHour);
 	if (nType == 2) strFile.Format("%s%s_%04d%02d%02d%02d_CapJobList.csv", strPath, gLot.sLotID[nNo], time.wYear, time.wMonth, time.wDay, time.wHour);
@@ -822,7 +822,7 @@ void CLogFile::Save_CmTrackingLog(CString strOut, int nTrayCount, int nPosX, int
 	CFile file;
 	if (!file.Open(strFile, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite)) return;
 
-	strTitle.Format("Time,Barcode,Judge,Port No,Tray No,CM No,Load Stage,Load Picker,Index Load,Index Load Jig,Unload Picker,NG Tray,NG Y,NG X,Ship Tray,Ship Y,Ship X\r\n");
+	strTitle.Format("Time,Station,LotNum,Barcode,Judge,Port No,Tray No,CM No,Load Stage,Load Picker,Index Load,Index Load Jig,Unload Picker,NG Tray,NG Y,NG X,Ship Tray,Ship Y,Ship X\r\n");
 
 	try {
 		file.SeekToEnd();
@@ -840,14 +840,18 @@ void CLogFile::Save_CmTrackingLog(CString strOut, int nTrayCount, int nPosX, int
 		nIdxLdJig	= gData.nCmJigNo[nPortNo-1][nTrayNo-1][nCmNo-1][INDEX_LOAD_JIG];
 		nUlPick		= gData.nCmJigNo[nPortNo-1][nTrayNo-1][nCmNo-1][UNLOAD_PICK];
 		
-		if (strOut == "GOOD") {
-			strSave.Format("%02d:%02d:%02d,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n", 
-				time.wHour, time.wMinute, time.wSecond, gMes.sBarID[nPortNo-1][nTrayNo-1][nCmNo-1], strJudge, nPortNo, nTrayNo, nCmNo, 
+		
+		if (strOut == "GOOD") 
+		{
+			strSave.Format("%04d-%02d-%02d %02d:%02d:%02d.%03d,%s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n", 
+				time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond,time.wMilliseconds, gData.sComName, gData.sLotID[0], gMes.sBarID[nPortNo-1][nTrayNo-1][nCmNo-1], strJudge, nPortNo, nTrayNo, nCmNo, 
 				nLdStageNo, nLdPick, nIdxLdNo, nIdxLdJig, nUlPick,
 				0, 0, 0, nTrayCount, nPosY+1, nPosX+1);
-		} else {
-			strSave.Format("%02d:%02d:%02d,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n", 
-				time.wHour, time.wMinute, time.wSecond, gMes.sBarID[nPortNo-1][nTrayNo-1][nCmNo-1], strJudge, nPortNo, nTrayNo, nCmNo, 
+		} 
+		else
+		{
+			strSave.Format("%04d-%02d-%02d %02d:%02d:%02d.%03d,%s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n", 
+				time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond,time.wMilliseconds,gData.sComName, gData.sLotID[0], gMes.sBarID[nPortNo-1][nTrayNo-1][nCmNo-1], strJudge, nPortNo, nTrayNo, nCmNo, 
 				nLdStageNo, nLdPick, nIdxLdNo, nIdxLdJig, nUlPick,
 				nTrayCount, nPosY+1, nPosX+1, 0, 0, 0);
 		}
@@ -875,7 +879,7 @@ void CLogFile::Save_ECMTracking(CString sLog, int nTrayCount, int nPosX, int nPo
 	strFile.Format("%s\\%s_%04d%02d%02d%02d_CapTracking.csv", strPath, gLot.sLotID[nPortNo-1], time.wYear, time.wMonth, time.wDay, time.wHour);
 
 //	strTitle.Format("Time,Barcode,Judge,Port No,Tray No,CM No,Load Stage,Load Picker,Index Load,Index Load Jig,NG Picker,NG Stage,Good Picker,Index Good No,Index Good Jig,Transfer Picker,NG Tray,NG Y,NG X,Ship Tray,Ship Y,Ship X\r\n");
-	strTitle.Format("Time,Barcode,Judge,Port No,Tray No,CM No,Load Stage,Load Picker,Index Load,Index Load Jig,Unload Picker,NG Tray,NG Y,NG X,Ship Tray,Ship Y,Ship X\r\n");
+	strTitle.Format("Time,Station,LotNum,Barcode,Judge,Port No,Tray No,CM No,Load Stage,Load Picker,Index Load,Index Load Jig,Unload Picker,NG Tray,NG Y,NG X,Ship Tray,Ship Y,Ship X\r\n");
 
 	CFile file;
 	if (!file.Open(strFile, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite)) return;

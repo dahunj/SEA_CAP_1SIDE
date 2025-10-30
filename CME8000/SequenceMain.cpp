@@ -1788,6 +1788,10 @@ BOOL CSequenceMain::TrayPicker_Run()
 			m_tTrayPickLoop.Takt_Save(1, 6);
 			m_tTrayPickLoop.Takt_Start();
 
+#ifndef AJIN_BOARD_USE
+			m_pDX00->iLoadPort1LowCheck = TRUE;
+#endif
+
 			m_bLoadPortTrayExist = TRUE;
 			gData.nPNoLoadPort = gData.nPNoTrayPick;
 			gData.nTNoLoadPort = gData.nTNoTrayPick;

@@ -208,6 +208,26 @@ BOOL CWorkDlg::OnInitDialog()
 		gData.nCapTrayCount = gData.nShipTrayCount = 999;
 	}
 
+
+#ifndef AJIN_BOARD_USE
+	m_stcShipTrayCnt.SetWindowText("99");
+	m_stcShipLotId.SetWindowText("5PKQFFFGGGGRT/5555/DDDDGGGGHHHH");
+	m_stcShipCnt.SetWindowText("5555");
+
+	m_stcCapTrayCnt.SetWindowText("99");
+	m_stcCapLotId.SetWindowText("3CPPGGGGFFFF/5555/DDDDGGGGHHHH");
+	m_stcCapCnt.SetWindowText("5555");
+
+	m_stcShipTrayCntS.SetWindowText("99");
+	m_stcShipLotIdS.SetWindowText("5PKQFFFGGGGRT/5555/DDDDGGGGHHHH");
+	m_stcShipCntS.SetWindowText("5555");
+
+	m_stcCapTrayCntS.SetWindowText("99");
+	m_stcCapLotIdS.SetWindowText("3CPPGGGGFFFF/5555/DDDDGGGGHHHH");
+	m_stcCapCntS.SetWindowText("5555");
+#endif
+
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
 }

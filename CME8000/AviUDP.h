@@ -59,7 +59,7 @@ public:
 	void Set_ApdReply();
 	void Set_TestTrayLoad();
 	void Set_TimeUpdate();
-
+	void Set_NotifyCmAlignAlarm();
 
 
 	void Set_ConnectStatus(BOOL isConnected) { m_bConnected = isConnected; }

@@ -3265,9 +3265,13 @@ BOOL CSequenceMain::VisionCM_Run()
 				{
 					//pass
 				}
-				else if((gData.nCmUseCount[gData.nPNoIndex[0]-1]/4) != m_pEquipData->nInspectCmScanTimes)
+				else if((gData.nCmUseCount[gData.nPNoIndex[0]-1]/4) < m_pEquipData->nInspectCmScanTimes)
 				{					
 					m_pEquipData->nInspectCmScanTimes = gData.nCmUseCount[gData.nPNoIndex[0]-1]/4;
+				}
+				else
+				{
+					m_pEquipData->nInspectCmScanTimes = gData.nInspectCmScanLineCntVolatile;
 				}
 
 				m_dwVisCmAlign = GetTickCount();
@@ -4569,16 +4573,26 @@ BOOL CSequenceMain::AssyPicker_Run()
 	switch (m_nAssyPickCase) {
 	case 0:		// Cap Buffer Check
 		if (Check_IndexEmpty(1) && !gData.IndexDone[1]) gData.IndexDone[1] = TRUE;
-		else if (m_nCapBufferCase == 10 /*&& !Check_AssyPickerFull()*/) m_nAssyPickCase++;
+		else if (m_nCapBufferCase == 10 /*&& !Check_AssyPickerFull()*/)
+		{
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
+			m_nAssyPickCase++;
+
+		}
 		return TRUE;
 
 	case 1:		// 안전확인 및 인덱스에 모듈이 있는지 확인
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_X, 0) && g_objCommon.Check_Position(AX_ASSY_PICKER_Y, 0) && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0) &&
-			g_objCommon.Get_AssyPickerUp(0) && m_pDX08->iAssyPickerTiltUp && !m_pDX08->iAssyPickerTiltDown) {
-			if (Check_IndexModule()) {
+			g_objCommon.Get_AssyPickerUp(0) && m_pDX08->iAssyPickerTiltUp && !m_pDX08->iAssyPickerTiltDown) 
+		{
+			if (Check_IndexModule()) 
+			{
 				m_dwAssyPick = GetTickCount();
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
-			} else {
+			}
+			else
+			{
 				if (Check_IndexEmpty(1) && !gData.IndexDone[1]) gData.IndexDone[1] = TRUE;
 				return TRUE;
 			}
@@ -4587,10 +4601,11 @@ BOOL CSequenceMain::AssyPicker_Run()
 	case 2:		// Z Move to Buffer Down, Picker Vac On
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_X, 0) && g_objCommon.Check_Position(AX_ASSY_PICKER_Y, 0) && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0) &&
 			g_objCommon.Get_AssyPickerUp(0) && m_pDX08->iAssyPickerTiltUp && !m_pDX08->iAssyPickerTiltDown) {
-			m_tAssyPickLoop.Takt_Start();
+			
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 1);
 			g_objCommon.Set_InfoAssyPickerDown(0);
 			g_objCommon.Set_InfoAssyPickerVacOn(0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4598,6 +4613,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 1) && g_objCommon.Get_InfoAssyPickerDown(0)) {
 			if (!m_tAssyPickLoop.Waiting_Time(m_pEquipData->nDelayAdd[2])) break;
 			g_objCommon.Set_CapBufferAlign(FALSE);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4615,32 +4631,35 @@ BOOL CSequenceMain::AssyPicker_Run()
 			}
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);
 			g_objCommon.Set_AssyPickerUp(0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(10000);
 		}
 		break;
 	case 5:		// X/Y/Z Move to Inspection Position
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0) && g_objCommon.Get_AssyPickerUp(0) && g_objCommon.Get_InfoAssyPickerVacOn(0)) {
-			m_tAssyPickLoop.Takt_Save(11, 1);
-			m_tAssyPickLoop.Takt_Start();
+			
 
 			//Loadcell 측정 해야하는지 확인.
 			if (m_pEquipData->nLoadCellChkCnt != 0 && m_pEquipData->nCappingCnt >= m_pEquipData->nLoadCellChkCnt) {
 				nApJobNo = 0;	// 측정하는 피커 시작 번호
 				dApY = m_pMoveData->dCapBufferStageY[3];
 				g_objAJinAXL.Move_Absolute(AX_CAP_BUFFER_STAGE_Y, dApY);	// Load Cell Position	
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase = 70; m_tAssyPickLoop.Set_LoopTime(10000);
 			} else {
 				if (m_nCapBufferCase == 10) m_nCapBufferCase = 11;
 				g_objCommon.Move_Position(AX_ASSY_PICKER_X, 1);
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Y, 1);
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 2);
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(10000);
 			}			
 		}
 		break;
 	case 6:		// Position Check
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_X, 1) && g_objCommon.Check_Position(AX_ASSY_PICKER_Y, 1) && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 2)) {
-			m_tAssyPickLoop.Takt_Save(11, 2);
+			
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 10; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4650,56 +4669,65 @@ BOOL CSequenceMain::AssyPicker_Run()
 
 	case 11:	// X/Y Move to Index Position
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_X, 1) && g_objCommon.Check_Position(AX_ASSY_PICKER_Y, 1) && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 2)) {
-			m_tAssyPickLoop.Takt_Start();
+			
 			nIndexNo = g_objCommon.Get_IndexPos(2);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_X, 2+nIndexNo);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Y, 2+nIndexNo);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(30000);
 		}
 		break;
 	case 12:	// Position Check
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_X, 2+nIndexNo) && g_objCommon.Check_Position(AX_ASSY_PICKER_Y, 2+nIndexNo) &&
-			g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0) && Check_CapAlignDone()) {
+			g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0) && Check_CapAlignDone()) 
+		{
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 15; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
 	case 15:	// Index Check
 		if (m_nMainIndexCase <= 10 && !gData.IndexDone[1]) {
 			if (Check_IndexEmpty(1) && !gData.IndexDone[1]) { gData.IndexDone[1] = TRUE; }
-			else											{ m_nAssyPickCase = 16; m_tTransStageLoop.Set_LoopTime(5000); }
+			else											
+			{ 
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
+				m_nAssyPickCase = 16; m_tTransStageLoop.Set_LoopTime(5000); 
+			}
 		}
 		return TRUE;
 
 	// Cap Index Down
 	case 16:	// Index Assy Vac Up
-		m_tAssyPickLoop.Takt_Save(11, 3);
-		m_tAssyPickLoop.Takt_Start();
-
+		
 		nIndexNo = g_objCommon.Get_IndexPos(2);
 		g_objCommon.Move_Position(AX_ASSY_PICKER_X, 2+nIndexNo);
 		g_objCommon.Move_Position(AX_ASSY_PICKER_Y, 2+nIndexNo);
 
 		m_pDY11->oIndexAssyVacUp = TRUE;
 		g_objAJinAXL.Write_Output(11);
+		m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 		m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
+
 		break;
 	case 17:	// Index Assy Vac On
 		if (m_pDX11->iIndexAssyVacUp && !m_pDX11->iIndexAssyVacDown) {
-			m_tAssyPickLoop.Takt_Save(11, 4);
-			m_tAssyPickLoop.Takt_Start();
+		
 			g_objCommon.Set_InfoIndexAssyVacuumOn();
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
 	case 18:	// Index Assy Align Out
 		//if (g_objCommon.Get_InfoIndexAssyVacuumOn()) {	// 버큠 확인안하고 바로조립하도록한다.
-			m_tAssyPickLoop.Takt_Save(11, 5);
+			
 			//m_pDY11->oIndexAssyAlignOut = TRUE;
 			//g_objAJinAXL.Write_Output(11);
 			if (Check_CapInspAllGood()) {
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 			} else {
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase = 50; m_tAssyPickLoop.Set_LoopTime(5000);
 			}
 		//}
@@ -4719,10 +4747,11 @@ BOOL CSequenceMain::AssyPicker_Run()
 				}
 			}
 
-			m_tAssyPickLoop.Takt_Start();
+		
 			g_objCommon.Set_InfoAssyPickerDown(1);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 3);	// Assembly Down Position
  			if (!m_pEquipData->bUseIndexAssyVac) g_objCommon.Set_IndexAssyVacuumOff(0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 25; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4733,6 +4762,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 			if (!m_tAssyPickLoop.Waiting_Time(m_pEquipData->nDelayAdd[5])) break;	// Assy Picker Cap Press Delay
 			dApZ = m_pMoveData->dAssyPickerZ[4];	// Cap Press
 			g_objAJinAXL.Move_AbsSlow(AX_ASSY_PICKER_Z, dApZ, 0.5);	// Slow
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4740,6 +4770,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objAJinAXL.Is_MoveDone(AX_ASSY_PICKER_Z, dApZ) && g_objCommon.Get_InfoAssyPickerDown(1)) {
 			if(!m_tAssyPickLoop.Waiting_Time(100)) break;	//2021.06.23c
 			g_objCommon.Set_InfoAssyPickerVacOff(0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4749,28 +4780,31 @@ BOOL CSequenceMain::AssyPicker_Run()
 			if (m_pEquipData->bUseAssyPickerTiltChk) {
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 5);	// Tilt Position
 				g_objCommon.Set_AssyPickerUp(0);
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 			} else {
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);	// Ready Position
 				g_objCommon.Set_AssyPickerUp(0);
 				g_objCommon.Set_InfoAssyPickerAirOff(0);
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase = 30; m_tAssyPickLoop.Set_LoopTime(5000);
 			}			
 		}
 		break;
 	case 28:	// Vac Off Check & Air Off, X/Y Axis Move to Tilt Check Position
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 5) && g_objCommon.Get_AssyPickerUp(0) && g_objCommon.Get_InfoAssyPickerVacOff(0)) {
-			m_tAssyPickLoop.Takt_Save(11, 6);
-			m_tAssyPickLoop.Takt_Start();
+			
 			g_objCommon.Set_InfoAssyPickerAirOff(0);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_X, 6);	// Tilt Position
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Y, 6);	// Tilt Position
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		} else {
 			if (!m_pEquipData->bUseAssyPickerTiltChk) {
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);	// Ready Position
 				g_objCommon.Set_AssyPickerUp(0);
 				g_objCommon.Set_InfoAssyPickerAirOff(0);
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase = 30; m_tAssyPickLoop.Set_LoopTime(5000);
 			}
 		}
@@ -4780,12 +4814,14 @@ BOOL CSequenceMain::AssyPicker_Run()
 			g_objCommon.Get_AssyPickerUp(0) && g_objCommon.Get_InfoAssyPickerVacOff(0)) {
 			m_pDY08->oAssyPickerTiltDown = TRUE;
 			g_objAJinAXL.Write_Output(8);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		} else {
 			if (!m_pEquipData->bUseAssyPickerTiltChk) {
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);	// Ready Position
 				g_objCommon.Set_AssyPickerUp(0);
 				g_objCommon.Set_InfoAssyPickerAirOff(0);
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 			}
 		}
@@ -4796,7 +4832,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 			!m_pDX09->iAssyPickerTilt04 && !m_pDX09->iAssyPickerTilt05 && !m_pDX09->iAssyPickerTilt06/*&& !m_pDX09->iAssyPickerCrossTilt*/)
 			|| !m_pEquipData->bUseAssyPickerTiltChk) {
 			if(!m_tAssyPickLoop.Waiting_Time(150)) break;
-			m_tAssyPickLoop.Takt_Save(11, 7);
+			
 			CString sLog;
 			SYSTEMTIME time;
 			GetLocalTime(&time);
@@ -4832,6 +4868,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 				}
 			}
 			g_objCommon.Set_IndexAssyVacuumOff(0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 35; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4841,33 +4878,34 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (((m_pEquipData->bUseAssyPickerTiltChk && m_pDX08->iAssyPickerTiltDown && !m_pDX08->iAssyPickerTiltUp && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 5)) || 
 			(!m_pEquipData->bUseAssyPickerTiltChk && !m_pDX08->iAssyPickerTiltDown && m_pDX08->iAssyPickerTiltUp && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0))) &&
 			g_objCommon.Get_AssyPickerUp(0)) {
-			m_tAssyPickLoop.Takt_Start();
+		
 			m_pDY08->oAssyPickerTiltDown = FALSE;
 			m_pDY11->oIndexAssyVacUp = FALSE;
 			m_pDY11->oIndexAssyAlignOut = FALSE;
 			g_objAJinAXL.Write_Output(8);
 			g_objAJinAXL.Write_Output(11);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
 	case 36:	// return
 		if (!m_pDX08->iAssyPickerTiltDown && m_pDX08->iAssyPickerTiltUp && !m_pDX11->iIndexAssyVacUp && m_pDX11->iIndexAssyVacDown &&
 			!m_pDX11->iIndexAssyAlignOut  && m_pDX11->iIndexAssyAlignIn && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0) && g_objCommon.Get_AssyPickerUp(0)) {
-			m_tAssyPickLoop.Takt_Save(11, 8);
-			m_tAssyPickLoop.Takt_Start();
+			
 
 			if (!gData.IndexDone[1]) gData.IndexDone[1] = TRUE;
 
 			g_objCommon.Move_Position(AX_ASSY_PICKER_X, 0);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Y, 0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
 	case 37:	// Position Check
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_X, 0) && g_objCommon.Check_Position(AX_ASSY_PICKER_Y, 0) && g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 0) &&
 			g_objCommon.Get_AssyPickerUp(0) && !m_pDX08->iAssyPickerTiltDown && m_pDX08->iAssyPickerTiltUp) {
-			m_tAssyPickLoop.Takt_Save(11, 9);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 0; m_tAssyPickLoop.Set_LoopTime(5000);
 
 			m_strLog.Format("AssyPicker, %d", GetTickCount() - m_dwAssyPick);
@@ -4891,13 +4929,14 @@ BOOL CSequenceMain::AssyPicker_Run()
 				}
 			}
 
-			m_tAssyPickLoop.Takt_Start();
+		
 			//g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 3);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 4);	//2021.06.23c
 			g_objCommon.Set_InfoAssyPickerGoodDown();	// Good Down
 
 			if (!m_pEquipData->bUseIndexAssyVac) g_objCommon.Set_IndexAssyVacuumOff(0);
 			//m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 56; m_tAssyPickLoop.Set_LoopTime(5000);	//2021.06.23c
 		}
 		break;
@@ -4905,6 +4944,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 3) && g_objCommon.Get_InfoAssyPickerGoodDown()) {
 			if(!m_tAssyPickLoop.Waiting_Time(100)) break;
 			if (!m_pEquipData->bUseAssyPickerVac) g_objCommon.Set_InfoAssyPickerGoodVacOff();
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 55; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4914,6 +4954,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 3) && g_objCommon.Get_InfoAssyPickerGoodDown()) {
 			dApZ = m_pMoveData->dAssyPickerZ[4];	// Cap Press
 			g_objAJinAXL.Move_AbsSlow(AX_ASSY_PICKER_Z, dApZ, 0.5);	// Slow
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4921,6 +4962,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objAJinAXL.Is_MoveDone(AX_ASSY_PICKER_Z, dApZ) && g_objCommon.Get_InfoAssyPickerGoodDown()) {
 			if(!m_tAssyPickLoop.Waiting_Time(100)) break;	//2021.06.23c
 			g_objCommon.Set_InfoAssyPickerGoodVacOff();	// Good Vac Off
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4938,6 +4980,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 3);	// Index Down
 			g_objCommon.Set_AssyPickerUp(0);
 			g_objCommon.Set_InfoAssyPickerGoodAirOff();	// Good Air Off
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 60; m_tAssyPickLoop.Set_LoopTime(5000);			
 		}
 		break;
@@ -4953,6 +4996,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 			g_objAJinAXL.Move_Absolute(AX_ASSY_PICKER_X, dApX);
 			g_objAJinAXL.Move_Absolute(AX_ASSY_PICKER_Y, dApY);
 
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		} else {
 			if (g_objAJinAXL.Is_Done(AX_ASSY_PICKER_Z)) {
@@ -4961,11 +5005,13 @@ BOOL CSequenceMain::AssyPicker_Run()
 					g_objCommon.Set_AssyPickerUp(0);
 // 					m_pDY08->oAssyPickerTiltDown = TRUE;
 // 					g_objAJinAXL.Write_Output(8);
+					m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 					m_nAssyPickCase = 28; m_tAssyPickLoop.Set_LoopTime(5000);
 				} else {
 					g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);	// Ready Position
 					g_objCommon.Set_AssyPickerUp(0);
 					g_objCommon.Set_InfoAssyPickerAirOff(0);
+					m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 					m_nAssyPickCase = 30; m_tAssyPickLoop.Set_LoopTime(5000);
 				}
 			}
@@ -4984,13 +5030,14 @@ BOOL CSequenceMain::AssyPicker_Run()
 				}
 			//}
 
-			m_tAssyPickLoop.Takt_Start();
+			
 			//g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 3);
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 4);	//2021.06.23c
 			g_objCommon.Set_AssyPickerDown(nApJobNo+1);
 
 			if (!m_pEquipData->bUseIndexAssyVac) g_objCommon.Set_IndexAssyVacuumOff(0);
 			//m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);	//2021.06.23c
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 66; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -4998,6 +5045,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 3) && g_objCommon.Get_AssyPickerDown(nApJobNo+1)) {
 			if(!m_tAssyPickLoop.Waiting_Time(100)) break;
 			if (!m_pEquipData->bUseAssyPickerVac) g_objCommon.Set_AssyPickerVacOff(nApJobNo+1);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 65; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -5007,6 +5055,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 3) && g_objCommon.Get_AssyPickerDown(nApJobNo+1)) {
 			dApZ = m_pMoveData->dAssyPickerZ[4];	// Cap Press
 			g_objAJinAXL.Move_AbsSlow(AX_ASSY_PICKER_Z, dApZ, 0.5);	// Slow
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -5014,16 +5063,19 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objAJinAXL.Is_MoveDone(AX_ASSY_PICKER_Z, dApZ) && g_objCommon.Get_AssyPickerDown(nApJobNo+1)) {
 			if(!m_tAssyPickLoop.Waiting_Time(100)) break;	//2021.06.23c
 			g_objCommon.Set_AssyPickerVacOff(nApJobNo+1);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(5000);
 		}
 		break;
 	case 67:	// Z Move to Index Down, Picker Up
-		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 4)) {
+		if (g_objCommon.Check_Position(AX_ASSY_PICKER_Z, 4)) 
+		{
 			if (!m_tAssyPickLoop.Waiting_Time(m_pEquipData->nVacOffDelay[1])) break;
 
 			if (gData.InfoIndex[1][nApJobNo] > 0 && gData.InfoAssyPick[nApJobNo] == 2) { gData.InfoAssyPick[nApJobNo] = 9; }
 			g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 3);	// Index Down
 			g_objCommon.Set_AssyPickerUp(0);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 60; m_tAssyPickLoop.Set_LoopTime(5000);			
 		}
 		break;
@@ -5042,6 +5094,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);	// Ready Up
 				g_objCommon.Set_AssyPickerUp(0);
 
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase = 5; m_tAssyPickLoop.Set_LoopTime(10000);
 			} else {
 				SYSTEMTIME time;
@@ -5049,6 +5102,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 				m_strLoadCellStart.Format("%04d-%02d-%02d %02d:%02d:%02d:%03d", time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 
 				g_objCommon.Set_AssyPickerDown(nApJobNo);
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(10000);
 			}
 		}
@@ -5057,6 +5111,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 		if (g_objCommon.Get_AssyPickerDown(nApJobNo) && g_objAJinAXL.Is_MoveDone(AX_CAP_BUFFER_STAGE_Y, dApY)) {
 			dApZ = m_pMoveData->dAssyPickerZ[6];	// Load Cell Down
 			g_objAJinAXL.Move_AbsSlow(AX_ASSY_PICKER_Z, dApZ, 0.5);	// Load Cell Down Position
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(10000);
 		}
 		break;
@@ -5065,6 +5120,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 			if (!m_tAssyPickLoop.Waiting_Time(m_pEquipData->nDelayAdd[4])) break;	// 측정 전 대기시간
 			gData.dLoadCell[0] = 0.0;
 			g_objLoadCell.Get_Weight(ASSY_LOAD_CELL);
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(10000);
 		}
 		break;
@@ -5083,6 +5139,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 
 				g_objCommon.Move_Position(AX_ASSY_PICKER_Z, 0);
 				g_objCommon.Set_AssyPickerUp(0);
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase++; m_tAssyPickLoop.Set_LoopTime(10000);
 			}
 		}
@@ -5093,6 +5150,7 @@ BOOL CSequenceMain::AssyPicker_Run()
 				dApY = m_pMoveData->dCapBufferStageY[3] + nApJobNo * m_pEquipData->dIndexPitch;
 				g_objAJinAXL.Move_Absolute(AX_CAP_BUFFER_STAGE_Y, dApY);
 			}
+			m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 			m_nAssyPickCase = 70; m_tAssyPickLoop.Set_LoopTime(10000);
 		}
 		break;
@@ -5103,11 +5161,13 @@ BOOL CSequenceMain::AssyPicker_Run()
 				m_pEquipData->nCappingCnt = 0;
 				CCME8000Dlg *pMainDlg = (CCME8000Dlg*)AfxGetApp()->m_pMainWnd;
 				pMainDlg->Save_EquipCappingCnt();
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase = 5; m_tAssyPickLoop.Set_LoopTime(10000);
 			} else {
 				nApJobNo = 0;
 				dApY = m_pMoveData->dCapBufferStageY[3];
 				g_objAJinAXL.Move_Absolute(AX_CAP_BUFFER_STAGE_Y, dApY);	// Load Cell Position	
+				m_tAssyPickLoop.Takt_Start();m_tAssyPickLoop.Takt_Save(11, m_nAssyPickCase);
 				m_nAssyPickCase = 70; m_tAssyPickLoop.Set_LoopTime(10000);
 			}
 		}
@@ -6344,6 +6404,11 @@ BOOL CSequenceMain::Run_Simulation()
 #endif
 
 	if (m_nLoadStage1Case == 1 || m_nLoadStage2Case == 1) {
+		if (gData.nCmUseCount[0] > 0) { Sleep(SIM_WAITTIMES); m_pDX00->iLoadPort1LowCheck = TRUE; }
+		if (gData.nCmUseCount[1] > 0) { Sleep(SIM_WAITTIMES); m_pDX01->iLoadPort2LowCheck = TRUE; }
+	}
+
+	if (m_nLoadStage1Case == 2 || m_nLoadStage2Case == 2) {
 		if (gData.nCmUseCount[0] > 0) { Sleep(SIM_WAITTIMES); m_pDX00->iLoadPort1LowCheck = TRUE; }
 		if (gData.nCmUseCount[1] > 0) { Sleep(SIM_WAITTIMES); m_pDX01->iLoadPort2LowCheck = TRUE; }
 	}

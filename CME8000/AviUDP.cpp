@@ -459,6 +459,15 @@ void CAviUDP::Set_TimeUpdate()
 	Send_Command(strSendCmd);
 }
 
+void CAviUDP::Set_NotifyCmAlignAlarm()
+{
+	CString	strSendCmd;
+	EQUIP_DATA *pEquipData = g_objDataManager.Get_pEquipData();
+
+	strSendCmd.Format("NOTIFY,ALARM,%s,%d", pEquipData->sAviIp, UDP_AVI_LPORT);
+	Send_Command(strSendCmd);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // UDP Socket Send Message
 

@@ -12,10 +12,10 @@
 #include "MESInterface.h"
 #include "AviUDP.h"
 
-#define UDP_VPC_HOST_IP	"127.0.0.1"
+#define UDP_VPC_HOST_IP	"192.168.25.23"
 
-#define UDP_VPC_LPORT	8001
-#define UDP_VPC_HPORT	8000
+#define UDP_VPC_LPORT	21000
+#define UDP_VPC_HPORT	21001
 
 IMPLEMENT_DYNAMIC(CInspector, CWnd)
 
@@ -52,9 +52,6 @@ void CInspector::Initialize()
 #else
 	bOpened = m_UdpVisionPC.Open_Socket(7000, 7001, "127.0.0.1", this);
 #endif
-	
-	
-
 	if (bOpened) Set_ConnectRequest();
 }
 
@@ -144,6 +141,9 @@ LRESULT CInspector::OnUdpReceive(WPARAM wLocalPort, LPARAM lParam)
 		} else if (strCmd == "INSPECT") {
 			if (strOp == "COMPLETE") Get_InspectComplete(strArg[0], strArg[1], strArg[2], strArg[3], strArg[4], strArg[5], strArg[6], strArg[7], strArg[8], strArg[9], strArg[10]);
 
+		} else if (strCmd == "SCAN") {
+			if (strOp == "COMPLETE") Get_ScanComplete(strArg[0], strArg[1], strArg[2], strArg[3], strArg[4]);
+
 		} else if (strCmd == "BARCODE") {
 			if (strOp == "RESULT") Get_BarcodeResult(strArg[0], strArg[1], strArg[2], strArg[3], strArg[4]);
 
@@ -155,6 +155,9 @@ LRESULT CInspector::OnUdpReceive(WPARAM wLocalPort, LPARAM lParam)
 
 		} else if (strCmd == "HEART") {
 			if (strOp == "BEAT") Get_HeartBeat();
+		
+		} else if (strCmd == "RELOAD") {
+			if (strOp == "REQUEST") Get_ReloadRequest();
 		}
 	}
 
@@ -204,6 +207,33 @@ void CInspector::Get_LotReady(CString sLotId, CString sPortNo, CString sProgVer,
 	m_bLotReady = TRUE;
 }
 
+void CInspector::Get_ScanComplete(CString sGbn, CString sLotId, CString sPortNo, CString sTrayNo, CString sCmNo)
+{
+	int nPx = atoi(sPortNo) - 1;
+	int	nTx = atoi(sTrayNo) - 1;
+	int	nCx = atoi(sCmNo) - 1;
+	if (nTx < 0 || nTx > 99 || nCx < 0 || nCx > 200) { g_objCommon.Show_Error(6101); return; }
+
+	int nV = ((sGbn == "T1" || sGbn == "T2") ? 0 : ((sGbn == "B1"|| sGbn == "B2") ? 1 : -1));
+	if (nV == -1) { g_objCommon.Show_Error(6102); return; }
+
+	EQUIP_DATA *pEquipData = g_objDataManager.Get_pEquipData();
+
+	if(nV == 0)
+	{
+		int nCase = g_objSequenceMain.Get_MainRunCase(AUTO_VISION_CM);
+		if (nCase != 5) { Exception_Log("Scan Complete", sGbn, nCase); return; }
+
+		m_nT1ScanCnt++;
+		if (m_nT1ScanCnt < m_nT1ScanReq) return; 
+
+		gData.bScanDone[0] = TRUE;
+		g_objSequenceMain.Set_MainRunCase(AUTO_VISION_CM, 10);
+
+	}	
+
+}
+
 void CInspector::Get_InspectComplete(CString sGbn, CString sLotId, CString sPortNo, CString sTrayNo, CString sCmNo, CString sJudge, CString sNGCode, CString sOffsetX, CString sOffsetY, CString sSizeX, CString sSizeY)
 {
 	int nPNo = atoi(sPortNo) - 1;
@@ -230,74 +260,17 @@ void CInspector::Get_InspectComplete(CString sGbn, CString sLotId, CString sPort
 		if (nCNo == nNo1) nPickNo = gData.nCmInspPickNo1 - 1;
 		if (nCNo == nNo2) nPickNo = gData.nCmInspPickNo2 - 1;
 
-		if (sJudge == "N") {	// 1Â÷
-//			if (nPreInfo < 3 || nPreInfo > 4) {
-				gData.nCmInspectInfo[nPNo][nTNo][nCNo] = 2;
-// 				gData.dIndexOffsetX[nIndexNo][nPickNo] = atof(sOffsetX);
-// 				gData.dIndexOffsetY[nIndexNo][nPickNo] = atof(sOffsetY);
-//			}
-		}
-		else if (sJudge == "G")	{	// Good
-//			if (nPreInfo < 2 || nPreInfo > 8) {
-				gData.nCmInspectInfo[nPNo][nTNo][nCNo] = 1;
-// 				gData.dIndexOffsetX[nIndexNo][nPickNo] = atof(sOffsetX);
-// 				gData.dIndexOffsetY[nIndexNo][nPickNo] = atof(sOffsetY);
-//			}
-		}
-		else if (sJudge != "G")  {
-//			if (nPreInfo < 2 || nPreInfo > 8) {
-				gData.nCmInspectInfo[nPNo][nTNo][nCNo] = 2;
-// 				gData.dIndexOffsetX[nIndexNo][nPickNo] = atof(sOffsetX);
-// 				gData.dIndexOffsetY[nIndexNo][nPickNo] = atof(sOffsetY);
-//			}
-		}
+		gData.nCmInspectInfo[nPNo][nTNo][nCNo] = (sJudge == "G" ? 1 : 2);
 
-		gData.dIndexOffsetX[nIndexNo][nPickNo] = atof(sOffsetX);	// CM Align Offset X
-		gData.dIndexOffsetY[nIndexNo][nPickNo] = atof(sOffsetY);	// CM Align Offset Y
-		gData.dIndexCmSizeX[nIndexNo][nPickNo] = atof(sSizeX);		// CM Size X
-		gData.dIndexCmSizeY[nIndexNo][nPickNo] = atof(sSizeY);		// CM Size Y
-
-		int nCase = g_objSequenceMain.Get_MainRunCase(AUTO_VISION_CM);
-		if (nCase != 5) { Exception_Log("Inspect Complete", sGbn, nCase); return; }
-		if (m_nT1ScanCnt > m_nT1ScanReq) return;
-
-		int nCmInfo1, nCmInfo2;
-		if (nNo1 >= 0) nCmInfo1 = gData.nCmInspectInfo[nPNo][nTNo][nNo1];
-		else		   nCmInfo1 = 1;
-		if (nNo2 >= 0) nCmInfo2 = gData.nCmInspectInfo[nPNo][nTNo][nNo2];
-		else		   nCmInfo2 = 1;
-		//Temp
-		if (!pEquipData->bUseVisionAlignAlarm && !pEquipData->bUseAlignOffset){
-			m_nT1ScanCnt++;
-			if (m_nT1ScanCnt == m_nT1ScanReq) {
-				gData.bScanDone[0] = TRUE;
-				g_objSequenceMain.Set_MainRunCase(AUTO_VISION_CM, 10);
-			}
-		} else {
-			if (pEquipData->bUseAlignOffset) {
-				m_nT1ScanCnt++;
-				if (m_nT1ScanCnt == m_nT1ScanReq) {
-					gData.bScanDone[0] = TRUE;
-					g_objSequenceMain.Set_MainRunCase(AUTO_VISION_CM, 10);
-				}
-			} else {
-				m_nT1ScanCnt++;
-				if (m_nT1ScanCnt == m_nT1ScanReq &&
-					(gData.InfoIndex[0][m_nT1ScanCnt] == 0 || (gData.InfoIndex[0][m_nT1ScanCnt] > 0 && nCmInfo1 == 1)) &&
-					(gData.InfoIndex[0][m_nT1ScanCnt+3] == 0 || (gData.InfoIndex[0][m_nT1ScanCnt+3] > 0 && nCmInfo2 == 1)))
-				{
-					m_nT1ScanCnt = 0;
-					gData.bScanDone[0] = TRUE;
-					g_objSequenceMain.Set_MainRunCase(AUTO_VISION_CM, 10);
-
-				} else {
-					if (m_nT1ScanCnt == m_nT1ScanReq) {
-						m_nT1ScanCnt = 0;
-						g_objSequenceMain.Set_MainRunCase(AUTO_VISION_CM, 6);
-					}
-				}
-			}			
+		if (pEquipData->bUseVisionAlignAlarm && gData.nCmInspectInfo[nPNo][nTNo][nCNo] == 2 )
+		{
+			CString sLog;
+			sLog.Format("[Alarm] CM Vision NG PortNo:%d, TrayNo:%d, CmNo:%d", nPNo+1, nTNo+1, nCNo+1);
+			g_objLogFile.Save_HandlerLog(sLog);
+			g_objAviUDP.Set_NotifyCmAlignAlarm();
+			g_objCommon.Show_Error(3606);	return;		
 		}
+		
 
 	} else if (sGbn == "B1" || sGbn == "B2") {
 		int nMode = theApp.Get_MainMode();

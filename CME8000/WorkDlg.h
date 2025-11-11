@@ -182,6 +182,8 @@ public:
 	BOOL Set_ShipLotIDChange();
 	int  Check_CapShipLotID(int nType, CString sBarID);
 	void MachineStopLog(CString sType, CString sMsg="");
+	afx_msg void OnBnClickedBtnLotstart1();
+	afx_msg void OnBnClickedBtnLotstart2();
 };
 
 extern CWorkDlg g_dlgWork;

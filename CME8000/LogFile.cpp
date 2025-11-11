@@ -805,9 +805,9 @@ void CLogFile::Save_MesAgentLog(CString sLog)
 
 void CLogFile::Save_CmTrackingLog(CString strOut, int nTrayCount, int nPosX, int nPosY, int nPortNo, int nTrayNo, int nCmNo)
 {
-	g_csCmTrackingLog.Lock();
-
 	if (nTrayNo < 1 || nTrayNo > 30 || nCmNo < 1 || nCmNo > 50) return;
+
+	g_csCmTrackingLog.Lock();
 
 	SYSTEMTIME time;
 	GetLocalTime(&time);

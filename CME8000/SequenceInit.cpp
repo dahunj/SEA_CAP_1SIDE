@@ -139,6 +139,7 @@ void CSequenceInit::Reset_InitialCase()
 	m_niUnloadStageCase	= 0;	// 10. (Error : 2000)
 }
 
+
 BOOL CSequenceInit::Check_Mode()
 {
 	if(theApp.Get_MainMode() == MODE_MANUAL
@@ -163,7 +164,7 @@ UINT CSequenceInit::Thread_Initial(LPVOID lpVoid)
 		if (!g_objCommon.Check_TrayFull()) break;
 		if (!g_objCommon.Check_ServoOn()) break;
 		if (!g_objCommon.Check_DirveAlarm()) break;
-
+		
 		if (!g_objSequenceInit.Initial_MainInit()) break;		//  0. (Error : 1000)
 		if (!g_objSequenceInit.Initial_LoadPicker()) break;		//  1. (Error : 1100)
 		if (!g_objSequenceInit.Initial_LoadStage()) break;		//  2. (Error : 1200)

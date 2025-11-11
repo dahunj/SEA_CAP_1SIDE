@@ -591,6 +591,7 @@ void CManualLoadDlg::OnbtnLoadPickerYClick(UINT nID)
 			AfxMessageBox("Load Picker Up 상태가 아닙니다. 확인 후 진행하세요."); return;
 		}
 	}
+	
 	if (!g_objCommon.Check_Position(AX_VISION_CM_ALIGN_X, 0)) {
 		AfxMessageBox("Vision CM Align X축이 Ready 위치가 아닙니다. 확인 후 진행하세요."); return;
 	}

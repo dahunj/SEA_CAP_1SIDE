@@ -36,6 +36,7 @@ public:
 
 	void Save_PCLog(int nPNo, CString sLog);
 
+
 	void Save_BarcodeChkLog(CString sLog);
 	BOOL Check_BarcodeLog(CString sBarcode);
 

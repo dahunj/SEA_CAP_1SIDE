@@ -219,6 +219,8 @@ void CSetupMotionTabDlg::OnBtnHomeClick(UINT nID)
 	int ID = nID - IDC_BTN_HOME_0;
 	int nStartAx = m_nMotionTab * 8;
 
+	
+
 	if (nStartAx + ID == 4 || nStartAx + ID == 6) {	// Load Stage1/2 X Axis Tray 유무 확인
 		DX_DATA_04 *pDX04 = g_objAJinAXL.Get_pDX04();
 		if (pDX04->iLoadStage1Exist || pDX04->iLoadStage2Exist) {
@@ -272,6 +274,7 @@ LRESULT CSetupMotionTabDlg::OnCsLButtonUp(WPARAM wParam, LPARAM lParam)
 	UINT nID = (int)wParam;
 	int nStartAx = m_nMotionTab * 8;
 
+	
 	if (nID >= IDC_BTN_JOG_P_0 && nID <= IDC_BTN_JOG_P_7) {			// Jog +
 		int ID = nID - IDC_BTN_JOG_P_0;
 		g_objAJinAXL.Stop_Motion(nStartAx + ID);
@@ -301,6 +304,7 @@ void CSetupMotionTabDlg::OnBtnAbsMoveClick(UINT nID)
 {
 	int ID = nID - IDC_BTN_ABS_MOVE_0;
 	int nStartAx = m_nMotionTab * 8;
+		
 
 	CString strText;
 	m_stcAbsDist[ID].GetWindowText(strText);
@@ -335,6 +339,7 @@ void CSetupMotionTabDlg::OnBtnRelMovePClick(UINT nID)
 	int ID = nID - IDC_BTN_REL_MOVE_P_0;
 	int nStartAx = m_nMotionTab * 8;
 
+	
 	CString strText;
 	m_stcRelDist[ID].GetWindowText(strText);
 	double dDist = atof(strText);
@@ -349,6 +354,7 @@ void CSetupMotionTabDlg::OnBtnRelMoveNClick(UINT nID)
 {
 	int ID = nID - IDC_BTN_REL_MOVE_N_0;
 	int nStartAx = m_nMotionTab * 8;
+		
 
 	CString strText;
 	m_stcRelDist[ID].GetWindowText(strText);
@@ -490,6 +496,8 @@ void CSetupMotionTabDlg::Cancel_MotionData(int nTab)
 		strValue.Format("%0.1lf", pParam->dAccel);	m_stcAccel[i].SetWindowText(strValue);
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 BOOL CSetupMotionTabDlg::Check_Interlock(int AxisNo)
 {

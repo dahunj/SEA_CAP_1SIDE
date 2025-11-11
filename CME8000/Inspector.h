@@ -36,6 +36,7 @@ private:
 	void Get_StatusUpdate(CString sStatus);
 
 	void Get_LotReady(CString sLotId, CString sPortNo, CString sProgVer, CString sParaVer);
+	void Get_ScanComplete(CString sGbn, CString sLotId, CString sPortNo, CString sTrayNo, CString sCmNo);
 	void Get_InspectComplete(CString sGbn, CString sLotId, CString sPortNo, CString sTrayNo, CString sCmNo, CString sJudge, CString sNGCode, CString sOffsetX, CString sOffsetY, CString sSizeX, CString sSizeY);
 	void Get_BarcodeResult(CString sLotId, CString sPortNo, CString sTrayNo, CString sCmNo, CString sBarcode);
 	void Get_ErrorRequest(CString sGbn, CString sLotId, CString sPortNo, CString sTrayNo, CString sCmNo, CString sErrNo);

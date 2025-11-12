@@ -224,8 +224,8 @@ void CInspector::Get_ScanComplete(CString sGbn, CString sLotId, CString sPortNo,
 		int nCase = g_objSequenceMain.Get_MainRunCase(AUTO_VISION_CM);
 		if (nCase != 5) { Exception_Log("Scan Complete", sGbn, nCase); return; }
 
-		m_nT1ScanCnt++;
-		if (m_nT1ScanCnt < m_nT1ScanReq) return; 
+		m_nT12ScanCnt++;
+		if (m_nT12ScanCnt < m_nT12ScanReq) return; 
 
 		gData.bScanDone[0] = TRUE;
 		g_objSequenceMain.Set_MainRunCase(AUTO_VISION_CM, 10);
@@ -493,18 +493,10 @@ void CInspector::Set_LoadComplete(CString sGbn, CString sLotId, int nPortNo, int
 	int nINo1 = -1;
 	int nINo2 = -1;
 
-	if (sGbn == "T1") {
-		int nScanReq = 0;
-		if (nCNo1 > 0) {
-			strBar1 = gMes.sBarID[nPortNo-1][nTNo1-1][nCNo1-1];
-			nINo1 = nIndexNo;
-			nScanReq++;
-		}
-		if (nCNo2 > 0) {
-			strBar2 = gMes.sBarID[nPortNo-1][nTNo2-1][nCNo2-1];
-			nINo2 = nIndexNo;
-			nScanReq++;
-		}
+	if (sGbn == "T12") {
+		m_nT12ScanReq = m_nT12ScanCnt = 0;
+		if (nCNo1 > 0) { strBar1 = gMes.sBarID[nPortNo-1][nTNo1-1][nCNo1-1]; nINo1 = nIndexNo; m_nT12ScanReq++; }
+		if (nCNo2 > 0) { strBar2 = gMes.sBarID[nPortNo-1][nTNo2-1][nCNo2-1]; nINo2 = nIndexNo; m_nT12ScanReq++; }
 
 		if (nCNo1 == 0) { nCNo1 = -1; nTNo1 = -1; nPickNo1 = -1; strBar1 = ""; }
 		if (nCNo2 == 0) { nCNo2 = -1; nTNo2 = -1; nPickNo2 = -1; strBar2 = ""; }
@@ -515,7 +507,9 @@ void CInspector::Set_LoadComplete(CString sGbn, CString sLotId, int nPortNo, int
 		if (strBar1 == "") strBar1.Format("NO_INFO1");
 		if (strBar2 == "") strBar2.Format("NO_INFO2");
 
-		m_nT1ScanReq = nScanReq; m_nT1ScanCnt = 0; gData.nInspCmNo[0][0] = nCNo1; gData.nInspCmNo[0][1] = nCNo2; gData.bScanDone[0] = FALSE; 
+		gData.nInspCmNo[0][0] = nCNo1;
+		gData.nInspCmNo[0][1] = nCNo2;
+		gData.bScanDone[0] = FALSE;
 	}
 
 	if (sGbn == "B1") {

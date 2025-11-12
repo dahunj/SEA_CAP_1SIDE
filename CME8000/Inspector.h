@@ -25,8 +25,8 @@ private:
 	int		m_nStatusVPC;		// Vision PC ป๓ลย (0:Not Ready, 1:Ready)
 	BOOL	m_bLotReady;
 
-	int		m_nB1ScanReq, m_nT1ScanReq;
-	int		m_nB1ScanCnt, m_nT1ScanCnt;
+	int		m_nB1ScanReq, m_nT12ScanReq;
+	int		m_nB1ScanCnt, m_nT12ScanCnt;
 
 	void Get_ConnectRequest();
 	void Get_ConnectReply();
@@ -75,7 +75,7 @@ public:
 	void Test_Command();
 
 	int Get_Btm1ScanRequest() {return m_nB1ScanReq;}
-	int Get_Top1ScanRequest() {return m_nT1ScanReq;}
+	int Get_Top1ScanRequest() {return m_nT12ScanReq;}
 };
 
 extern CInspector g_objInspector;

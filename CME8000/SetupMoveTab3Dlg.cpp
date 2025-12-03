@@ -243,7 +243,7 @@ void CSetupMoveTab3Dlg::Save_MoveData()
  	CIniFileCS INI(gsCurrentDir + "\\System\\MoveData_" + gData.sVendor + ".ini");
 	if (!INI.Check_File()) { AfxMessageBox("MoveData.ini File Not Found!!!"); return; }
 
-	g_objCommon.Backup_File(gsCurrentDir + "\\System", "MoveData");
+	g_objCommon.Backup_File(gsCurrentDir + "\\System", "MoveData_"+ gData.sVendor);
 
 	CString strKey, strData;
 	double dData;

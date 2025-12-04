@@ -5794,26 +5794,29 @@ BOOL CSequenceMain::UnloadStage1_Run()
 			m_pDY05->oUnloadStage1SlaveIn = FALSE;
 			g_objAJinAXL.Write_Output(5);
 			m_tUnloadStage1Loop.Takt_Save(14, 14);
-			m_nUnloadStage1Case++; m_tUnloadStage1Loop.Set_LoopTime(5000);
+			m_nUnloadStage1Case++; m_tUnloadStage1Loop.Set_LoopTime(30000);
 		}
 		break;
 
 	case 10:	// 안전 확인 
-		if (!m_tUnloadStage1Loop.Waiting_Time(300)) return TRUE;;
+		if (!m_tUnloadStage1Loop.Waiting_Time(200)) return TRUE;
 		if(g_objCommon.Get_UnloadTrayMasterSlaveOut(1))
 		{
+			if (!m_tUnloadStage1Loop.Waiting_Time(100)) return TRUE;
 			m_pDY05->oUnloadStage1MasterIn = TRUE;			
 			g_objAJinAXL.Write_Output(5);
 		}
-		if (m_pDX05->iUnloadStage1MasterIn && !m_pDX05->iUnloadStage1MasterOut)
+		else if (m_pDX05->iUnloadStage1MasterIn && !m_pDX05->iUnloadStage1MasterOut && !m_pDX05->iUnloadStage1SlaveIn && m_pDX05->iUnloadStage1SlaveOut)
 		{
+			if (!m_tUnloadStage1Loop.Waiting_Time(100)) return TRUE;
 			m_pDY05->oUnloadStage1SlaveIn = TRUE;
 			g_objAJinAXL.Write_Output(5);
 		}
-		if (m_nUnloadStage2Case > 22 && g_objCommon.Get_UnloadTrayMasterSlaveIn(1)) {
+		else if (m_nUnloadStage2Case > 22 && g_objCommon.Get_UnloadTrayMasterSlaveIn(1)) 
+		{
 			m_nUnloadStage1Case++; m_tUnloadStage1Loop.Set_LoopTime(5000);
 		}
-		return TRUE;
+		break;
 
 	case 11:	// Y Move to Work Position
 		if (g_objCommon.Check_Position(AX_UNLOAD_STAGE1_Z, 0) && m_pDX05->iUnloadStage1Exist) {
@@ -6119,27 +6122,29 @@ BOOL CSequenceMain::UnloadStage2_Run()
 			m_pDY05->oUnloadStage2SlaveIn = FALSE;
 			g_objAJinAXL.Write_Output(5);
 			m_tUnloadStage2Loop.Takt_Save(15, 14);							
-			m_nUnloadStage2Case++; m_tUnloadStage2Loop.Set_LoopTime(5000);
+			m_nUnloadStage2Case++; m_tUnloadStage2Loop.Set_LoopTime(30000);
 		}
 		break;
 
 	case 10:	// 안전 확인 
-		if (!m_tUnloadStage2Loop.Waiting_Time(300)) return TRUE;;
+		if (!m_tUnloadStage2Loop.Waiting_Time(200)) return TRUE;
 		if(g_objCommon.Get_UnloadTrayMasterSlaveOut(2))
 		{
+			if (!m_tUnloadStage2Loop.Waiting_Time(100)) return TRUE;
 			m_pDY05->oUnloadStage2MasterIn = TRUE;			
 			g_objAJinAXL.Write_Output(5);			
 		}
-		if (m_pDX05->iUnloadStage2MasterIn && !m_pDX05->iUnloadStage2MasterOut)
+		else if (m_pDX05->iUnloadStage2MasterIn && !m_pDX05->iUnloadStage2MasterOut && !m_pDX05->iUnloadStage2SlaveIn && m_pDX05->iUnloadStage2SlaveOut)
 		{
+			if (!m_tUnloadStage2Loop.Waiting_Time(100)) return TRUE;
 			m_pDY05->oUnloadStage2SlaveIn = TRUE;
 			g_objAJinAXL.Write_Output(5);
 		}
-		if (m_nUnloadStage1Case > 22 && g_objCommon.Get_UnloadTrayMasterSlaveIn(2) ) 
+		else if (m_nUnloadStage1Case > 22 && g_objCommon.Get_UnloadTrayMasterSlaveIn(2) ) 
 		{ 				
 			m_nUnloadStage2Case++; m_tUnloadStage2Loop.Set_LoopTime(5000); 
 		}
-		return TRUE;
+		break;
 
 	case 11:	// Y Move to Work Position
 		if (g_objCommon.Check_Position(AX_UNLOAD_STAGE2_Z, 0) && m_pDX05->iUnloadStage2Exist) {
